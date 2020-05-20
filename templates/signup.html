@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% import "bootstrap/form.html" as wtf %}
+
+
+{% block title %}
+Sign Up
+{% endblock %}
+
+{% block styles %}
+{{super()}}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='background.css') }}">
+{% endblock %}
+
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+	  {% if messages %}
+	    {% for message in messages %}
+		  <div class="alert alert-warning alert-dismissible" role="alert">
+		  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+			{{message}}
+		  </div>
+		{% endfor %}
+	  {% endif %}
+	{% endwith %}
+
+    <!-- Navigation -->
+
+{% if current_user.is_authenticated %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">Ayush Zenith's Website for APCSP</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('index') }}">Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="{{ url_for('login') }}">Login</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link disabled" href="{{ url_for('signup') }}">Sign Up
+            <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
+          </li>
+            <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}">Sign Out</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+{% else %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">Ayush Zenith's Website for APCSP</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('index') }}">Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('signup') }}">Sign Up
+            <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="{{ url_for('profile') }}">Profile</a>
+          </li>
+            <li class="nav-item">
+            <a class="nav-link disabled" href="{{ url_for('logout') }}">Sign Out</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+{% endif %}
+
+
+
+
+<div class="container">
+
+  <form class="form-signin" method="POST" action="/signup">
+    <h2 class="mt-5 text-light">Sign Up</h2>
+    {{ form.hidden_tag() }}
+    {{ wtf.render_field(form.firstname,placeholder='First Name') }}
+    {{ wtf.render_field(form.lastname,placeholder='Last Name') }}
+    {{ wtf.render_field(form.username,placeholder='Username') }}
+    {{ wtf.render_field(form.email,placeholder='Email') }}
+    {{ wtf.render_field(form.password,placeholder='Password') }}
+    {{ wtf.render_field(form.confirm,placeholder='Confirm Password') }}
+    {{ wtf.render_field(form.terms) }}
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign Up</button>
+  </form>
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary mt-2" data-toggle="modal" data-target="#exampleModal">
+  Terms and Conditions
+</button>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Terms and Conditions</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        This site is for educational purposes only and data is not encrypted or stored on a secure server. All passwords are hashed and stored but the packets can be intercepted and arent secure.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div> <!-- /container -->
+
+{% endblock %}

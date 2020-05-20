@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% import "bootstrap/form.html" as wtf %}
+
+
+{% block title %}
+Profile
+{% endblock %}
+
+{% block styles %}
+{{super()}}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='background.css') }}">
+{% endblock %}
+
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+	  {% if messages %}
+	    {% for message in messages %}
+		  <div class="alert alert-warning alert-dismissible" role="alert">
+		  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+			{{message}}
+		  </div>
+		{% endfor %}
+	  {% endif %}
+	{% endwith %}
+
+
+
+    <!-- Navigation -->
+ {% if current_user.is_authenticated %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">Ayush Zenith's Website for APCSP</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('index') }}">Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="{{ url_for('login') }}">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="{{ url_for('signup') }}">Sign Up
+            </a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('profile') }}">Profile
+            <span class="sr-only">(current)</span>
+            </a>
+          </li>
+            <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}">Sign Out</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+{% else %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">Ayush Zenith's Website for APCSP</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('index') }}">Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('signup') }}">Sign Up
+            </a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link disabled" href="{{ url_for('profile') }}">Profile
+            <span class="sr-only">(current)</span>
+            </a>
+          </li>
+            <li class="nav-item">
+            <a class="nav-link disabled" href="{{ url_for('logout') }}">Sign Out</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+{% endif %}
+
+
+<div class="container">
+{% if current_user.is_authenticated %}
+    <br>
+    <br>
+    <br>
+    <h1> Hi {{ username }}!</h1>
+{% endif %}
+</div>
+
+{% endblock %}

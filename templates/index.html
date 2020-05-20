@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+{% block html_attribs %} lang="en"{% endblock %}
+
+{% block styles %}
+{{super()}}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='background.css') }}">
+{% endblock %}
+
+
+{% block title %}Ayush Zenith{% endblock %}
+
+{% block head %}
+{{super()}}
+<meta charset="UTF-8">
+{% endblock %}
+
+
+
+{% block content %}
+
+
+   <!-- Navigation -->
+
+{% if current_user.is_authenticated %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">Ayush Zenith's Website for APCSP</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('index') }}">Home
+                            <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="{{ url_for('login') }}">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="{{ url_for('signup') }}">Sign Up
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('profile') }}">Profile
+            </a>
+          </li>
+            <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('logout') }}">Sign Out</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+{% else %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">Ayush Zenith's Website for APCSP</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('index') }}">Home
+              <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('signup') }}">Sign Up</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="{{ url_for('profile') }}">Profile</a>
+          </li>
+            <li class="nav-item">
+            <a class="nav-link disabled" href="{{ url_for('logout') }}">Sign Out</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+{% endif %}
+
+  <!-- Page Content -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h1 class="mt-5 text-light">Ayush Zenith</h1>
+        <p class="lead text-light">Login page...</p>
+        <ul class="list-unstyled text-light">
+          <li>Bootstrap 4.3.1</li>
+          <li>jQuery 3.4.1</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+{% endblock %}
