@@ -17,17 +17,17 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 #pip install Flask-SQLAlchemy
 #pip install flask-login
 
+#python3
+#from app import db
+#db.create_all()
+#exit()
+
 #sqlite3 database.db
 #.tables to see the table User
 #select * from user; to see all the users in the user table
 #delete from user; to delete all the users in the user table
 #DELETE FROM user WHERE id=3; to delete using id
 #.exit
-
-#python3
-#from app import db
-#db.create_all()
-#exit()
 
 
 app = Flask(__name__)
