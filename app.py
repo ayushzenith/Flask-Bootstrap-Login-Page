@@ -21,6 +21,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 #.tables to see the table User
 #select * from user; to see all the users in the user table
 #delete from user; to delete all the users in the user table
+#DELETE FROM user WHERE id=3; to delete using id
 #.exit
 
 #python3
