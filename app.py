@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, flash, url_for, redirect
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
@@ -6,6 +7,8 @@ from wtforms.validators import InputRequired, Email, Length, DataRequired, Equal
 from passlib.hash import sha256_crypt
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_socketio import SocketIO, send, join_room, leave_room
+import sqlite3
 
 
 #pip uninstall flask-bootstrap
@@ -22,7 +25,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 #db.create_all()
 #exit()
 
-#sqlite3 database.db
+#sqlite3 user.db
 #.tables to see the table User
 #select * from user; to see all the users in the user table
 #delete from user; to delete all the users in the user table
@@ -32,10 +35,11 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://///Users/ayushzenith/PycharmProjects/FlaskAPCSP/database.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////"+os.getcwd()+"/app.db"
 
 Bootstrap(app)
 
+socketio = SocketIO(app)
 db = SQLAlchemy(app)
 
 loginmanager = LoginManager()
@@ -49,6 +53,11 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(14), unique=True, nullable=False)
     email = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(80))
+
+class chatrooms(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    roomid = db.Column(db.String(80), unique=True, nullable=False)
+    usersonline = db.Column(db.Integer, unique=False, nullable=False)
 
 
 @loginmanager.user_loader
@@ -113,13 +122,70 @@ def signup():
             db.session.commit()
             flash('New user has been created!')
         except:
-            flash('Username has already been taken')
+            flash('Username or Email has already been taken')
     return render_template('signup.html', form = form)
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
     return render_template('profile.html', username = current_user.username)
+
+@app.route('/chathome')
+@login_required
+def chathome():
+    conn = sqlite3.connect('app.db')
+    cursor = conn.cursor()
+    sqlite_select_query = """SELECT * from chatrooms"""
+    cursor.execute(sqlite_select_query)
+    records = cursor.fetchall()
+    temp = "<br><br> Current Chatrooms are(refresh page to update unfortunately i didnt have time to asyncronously update):<br><br>"
+    for row in records:
+        temp = temp + "Id: " + str(row[0]) + "\n<br>"
+        temp = temp + "RoomId: " + str(row[1]) + "\n<br>"
+        temp = temp + "\n<br>"
+    return render_template("chatroom.html", sqlstuff = temp)
+
+@app.route('/chathome/chat', methods=['GET', 'POST'])
+@login_required
+def chat():
+    username = current_user.firstname + " \"" + current_user.username + "\" " + current_user.lastname
+    room = request.args.get('room')
+    try:
+        roomid = chatrooms(roomid=room, usersonline=0)
+        db.session.add(roomid)
+        db.session.commit()
+        print(room)
+    except:
+        print("not working")
+        print(room)
+    if username and room:
+        return render_template('chat.html', username=username, room=room)
+    else:
+        return redirect(url_for('chathome'))
+
+@socketio.on('send_message')
+def handle_send_message_event(data):
+    app.logger.info("{} has sent message to the room {}: {}".format(data['username'],data['room'],data['message']))
+    socketio.emit('receive_message', data, room=data['room'])
+
+@socketio.on('join_room')
+def handle_join_room_event(data):
+    try:
+        x = chatrooms.query.filter_by(roomid=data['room']).first()
+        if x:
+            SQLAlchemy.update(chatrooms).where(chatrooms.roomid == data['room']).values(usersonline = x.usersonline + 1)
+    except:
+        print("sad")
+    app.logger.info("{} has joined the room {}".format(data['username'], data['room']))
+    join_room(data['room'])
+    socketio.emit('join_room_announcement', data, room=data['room'])
+
+
+@socketio.on('leave_room')
+def handle_leave_room_event(data):
+    app.logger.info("{} has left the room {}".format(data['username'], data['room']))
+    leave_room(data['room'])
+    socketio.emit('leave_room_announcement', data, room=data['room'])
 
 
 @app.route('/logout')
@@ -129,4 +195,4 @@ def logout():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run()
+    socketio.run(app)

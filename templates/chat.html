@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 {% import "bootstrap/form.html" as wtf %}
 
-
 {% block title %}
-Profile
+Chat
 {% endblock %}
 
 {% block styles %}
@@ -24,9 +23,7 @@ Profile
 	{% endwith %}
 
 
-
-    <!-- Navigation -->
- {% if current_user.is_authenticated %}
+{% if current_user.is_authenticated %}
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
     <div class="container">
       <a class="navbar-brand" href="#">Ayush Zenith's Website for APCSP</a>
@@ -46,12 +43,13 @@ Profile
             <a class="nav-link disabled" href="{{ url_for('signup') }}">Sign Up
             </a>
           </li>
-            <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('chathome') }}">Chat Rooms</a>
-          </li>
-          <li class="nav-item active">
-            <a class="nav-link" href="{{ url_for('profile') }}">Profile
+            <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('chathome') }}">Chat Rooms
             <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('profile') }}">Profile
             </a>
           </li>
             <li class="nav-item">
@@ -81,12 +79,13 @@ Profile
             <a class="nav-link" href="{{ url_for('signup') }}">Sign Up
             </a>
           </li>
-            <li class="nav-item">
-            <a class="nav-link disabled" href="{{ url_for('chathome') }}">Chat Rooms</a>
-          </li>
-          <li class="nav-item active">
-            <a class="nav-link disabled" href="{{ url_for('profile') }}">Profile
+            <li class="nav-item active">
+            <a class="nav-link disabled" href="{{ url_for('chathome') }}">Chat Rooms
             <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled" href="{{ url_for('profile') }}">Profile
             </a>
           </li>
             <li class="nav-item">
@@ -98,14 +97,82 @@ Profile
   </nav>
 {% endif %}
 
+<body>
+
 
 <div class="container">
-{% if current_user.is_authenticated %}
+    <h2 class="mt-5 text-light">Welcome to chat room {{ room }}</h2>
+    <div id="messages"></div>
     <br>
-    <br>
-    <br>
-    <h1> Hi {{ username }}!</h1>
-{% endif %}
-</div>
+      <form class="form-signin" id="message_input_form">
+            <div class="form-group required">
+                <input class="form-control" id="message_input" placeholder="Enter your message here" required type="text">
+            </div>
+        <button class="btn btn-lg btn-primary btn-block mt-3" type="submit">Send</button>
+      </form>
 
+    </div> <!-- /container -->
+
+</body>
+
+{% block scripts %}
+{{super()}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script>
+    const socket = io.connect("http://127.0.0.1:5000");
+
+    socket.on('connect', function () {
+        socket.emit('join_room', {
+            username: "{{ username }}",
+            room: "{{ room }}"
+        });
+
+        let message_input = document.getElementById('message_input');
+
+        document.getElementById('message_input_form').onsubmit = function (e) {
+            e.preventDefault();
+            let message = message_input.value.trim();
+            if (message.length) {
+                socket.emit('send_message', {
+                    username: "{{ username }}",
+                    room: "{{ room }}",
+                    message: message
+                })
+            }
+            message_input.value = '';
+            message_input.focus();
+        }
+    });
+
+    window.onbeforeunload = function () {
+        socket.emit('leave_room', {
+            username: "{{ username }}",
+            room: "{{ room }}"
+        })
+    };
+
+    socket.on('receive_message', function (data) {
+        console.log(data);
+        const newNode = document.createElement('div');
+        newNode.innerHTML = `<b>${data.username}:&nbsp;</b> ${data.message}`;
+        document.getElementById('messages').appendChild(newNode);
+    });
+
+    socket.on('join_room_announcement', function (data) {
+        console.log(data);
+        if (data.username !== "{{ username }}") {
+            const newNode = document.createElement('div');
+            newNode.innerHTML = `<b>${data.username}</b> has joined the room`;
+            document.getElementById('messages').appendChild(newNode);
+        }
+    });
+
+    socket.on('leave_room_announcement', function (data) {
+        console.log(data);
+        const newNode = document.createElement('div');
+        newNode.innerHTML = `<b>${data.username}</b> has left the room`;
+        document.getElementById('messages').appendChild(newNode);
+    });
+</script>
+{% endblock %}
 {% endblock %}
